@@ -1,0 +1,90 @@
+{% extends 'layout/header.html' %}
+{% block title %} Transacciones {% endblock %}
+
+{% block content %}
+
+{% include 'layout/menu2.html' %} 
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="container">
+        <br>
+        <h1 class="text-center t">Registro de transacciones</h1>
+        <!-- Botón para abrir el modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transaccionModal">
+            Registrar Transacción
+        </button> <br> <br>
+
+        <!-- Modal para el formulario de transacción -->
+        <div class="modal fade" id="transaccionModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrar Transacción</h5> 
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Formulario de transacción -->
+                        <form method="post">
+                            <label for="producto_id">Producto:</label>
+                            <select class="form-select" aria-label="Default select example" name="producto_id"
+                                id="producto_id">
+                                {% for producto in productos %}
+                                <option value="{{ producto.id }}">{{ producto.descripcion }}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+
+                            <label for="tipo">Tipo de Transacción:</label>
+                            <select class="form-select" aria-label="Default select example" name="tipo" id="tipo">
+                                <option value="Entrada">Entrada</option>
+                                <option value="Salida">Salida</option>
+                            </select>
+
+                            <br>
+
+                            <label for="cantidad">Cantidad:</label>
+                            <input class="form-control" type="number" name="cantidad" id="cantidad">
+                            <br>
+                            <div class="mb-3">
+                                <label for="exampleFormControlTextarea1" class="form-label">Observaciones</label>
+                                <textarea class="form-control" name="observaciones" id="observaciones"
+                                    rows="3"></textarea>
+                            </div>
+                            <br> <br>
+                            <button type="submit" class="btn btn-primary">Guardar Transacción</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <h1>Transacciones Registradas</h1> <br>
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Tipo de Transacción</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Observaciones</th>
+                    <th scope="col">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaccion in transacciones %}
+                <tr>
+                    <td>{{ transaccion.descripcion }}</td>
+                    <td>{{ transaccion.tipo }}</td>
+                    <td>{{ transaccion.cantidad }}</td>
+                    <td>{{ transaccion.observaciones }}</td>
+                    <td>{{ transaccion.fecha }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+{% endblock %}
