@@ -240,11 +240,18 @@ def mostrar_imagen(imagen_id):
     return 'Imagen no encontrada', 404   
     
 # Ruta para editar un producto
-@app.route('/editar_producto/<int:id>', methods=["POST"])
+@app.route('/editar_producto/<int:id>', methods=["POST", "GET"])
 def editar_producto(id):
     if request.method == 'POST':
         nuevo_foto = request.files['nuevo_foto']
-        
+        nuevo_descripcion = request.form['nuevo_descripcion']
+        nuevo_precio_costo = request.form['nuevo_precio_costo']
+        nuevo_precio_venta = request.form['nuevo_precio_venta']
+        nuevo_cantidad = request.form['nuevo_cantidad']
+        nuevo_ubicacion = request.form['nuevo_ubicacion']
+        nuevo_id_categoria = request.form['nuevo_id_categoria']
+
+        # Actualizar la imagen si se proporciona una nueva
         if nuevo_foto:
             if not os.path.exists('uploads'):
                 os.mkdir('uploads')
@@ -256,17 +263,35 @@ def editar_producto(id):
             with open(ruta_imagen, 'rb') as f:
                 imagen_bytes = f.read()
 
-            # Actualiza la imagen en la base de datos
+            # Actualizar la imagen en la base de datos
             cur = mysql.connection.cursor()
             cur.execute("UPDATE productos SET foto = %s WHERE id = %s", (imagen_bytes, id))
             mysql.connection.commit()
             cur.close()
-            
             flash('Imagen actualizada con éxito', 'success')
 
+        # Actualizar otros campos en la base de datos
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE productos SET descripcion = %s, precio_costo = %s, precio_venta = %s, cantidad = %s, ubicacion = %s, id_categoria = %s WHERE id = %s",
+                    (nuevo_descripcion, nuevo_precio_costo, nuevo_precio_venta, nuevo_cantidad, nuevo_ubicacion, nuevo_id_categoria, id))
+        mysql.connection.commit()
+        cur.close()
+        flash('Producto actualizado con éxito', 'success')
 
-    return redirect('/productosA')
+        return redirect('/productosA')
 
+    else:
+        # Si es una solicitud GET, debes recuperar los datos del producto
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM productos WHERE id = %s", (id,))
+        producto = cur.fetchone()
+        cur.close()
+
+        if producto:
+            return render_template('editar_producto.html', producto=producto)
+        else:
+            flash('Producto no encontrado', 'error')
+            return redirect('/productosA')
 
 
 # Ruta para eliminar un producto
@@ -471,4 +496,4 @@ def descargar_excel():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+     app.run(host='0.0.0.0', port=5000)
